@@ -1,20 +1,31 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {  useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Formulario from './components/Formulario';
+import IntentoSesion from './components/IntentoSesion';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+const Stack = createStackNavigator();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const App = () => {
+
+    useEffect(() => { // Verificar si hay una sesión activa
+        const checkSession = async () => { // Función para verificar la sesión
+            const token = await AsyncStorage.getItem('userToken'); // Obtener el token de usuario
+            setIsLoggedIn(!!token); // Actualizar el estado de la sesión
+        };
+
+        checkSession(); // Verificar si hay una sesión activa
+    }, []);
+
+    return (
+        <NavigationContainer>
+            <Stack.Navigator>
+                    <Stack.Screen name="Formulario" component={Formulario} />
+                    <Stack.Screen name="IntentoSesion" component={IntentoSesion} />
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
+};
+
+export default App;
