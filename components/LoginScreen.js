@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const IntentoSesion = ({ navigation }) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+const LoginScreen = ({ navigation }) => {
+    const [correo, setCorreo] = useState('');
+    const [contrasena, setContrasena] = useState('');
 
-    const handleLogin = async () => { // Función para iniciar sesión
+    const validaciones = Yup.object().shape({
+      correo: Yup.string().email().required('Ingrese un correo valido'),
+      contrasena: Yup.number().required('Ingrese una contraseña valida'),
+    });
+
+    const handleLogin = async () => { 
         try {
-            if (username === 'leonardo' && password === 'contraS') { // Verificar las credenciales
+            if (correo === 'leonardo@gmail.com' && password === 'contraS') { // Verificar las credenciales
                 const token = 'faketoken123'; // Token de usuario
                 await AsyncStorage.setItem('userToken', token); //  Guardar el token de usuario
-                navigation.navigate('Formulario', { username }); // Pasar el nombre de usuario como parámetro
+                navigation.navigate('HomeScreen'); // Pasar el nombre de usuario como parámetro
                 console.log(navigation);
             } else {
                 Alert.alert('Error', 'Usuario o contraseña incorrectos'); // Mostrar alerta de error
@@ -24,22 +31,30 @@ const IntentoSesion = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Inicio de Sesión</Text>
+             <Formik
+                    initialValues={{ correo: '', contrasena: '' }}
+                    validationSchema={validaciones}
+                    onSubmit={(values) => {
+                      console.log('Formulario enviado:', values);
+                    }}
+                  >
             <TextInput
                 style={styles.input}
                 placeholder="Nombre de usuario"
                 placeholderTextColor="gray"
-                value={username}
-                onChangeText={setUsername}
+                value={correo}
+                onChangeText={setCorreo}
             />
             <TextInput
                 style={styles.input}
                 placeholder="Contraseña"
                 placeholderTextColor="gray"
-                value={password}
-                onChangeText={setPassword}
+                value={contrasena}
+                onChangeText={setContrasena}
                 secureTextEntry
             />
             <Button title="Iniciar Sesión" onPress={handleLogin} />
+            </Formik>
         </View>
     );
 };
@@ -67,4 +82,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default IntentoSesion;
+export default LoginScreen;
