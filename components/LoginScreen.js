@@ -7,79 +7,96 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const LoginScreen = ({ navigation }) => {
     const [correo, setCorreo] = useState('');
     const [contrasena, setContrasena] = useState('');
-
+    
     const validaciones = Yup.object().shape({
-      correo: Yup.string().email().required('Ingrese un correo valido'),
-      contrasena: Yup.number().required('Ingrese una contraseña valida'),
-    });
+    correo: Yup.string().email('Ingrese un correo válido').required('Campo requerido'),
+    contrasena: Yup.string().required('Ingrese una contraseña válida'),
+  });
 
-    const handleLogin = async () => { 
-        try {
-            if (correo === 'leonardo@gmail.com' && password === 'contraS') { // Verificar las credenciales
-                const token = 'faketoken123'; // Token de usuario
-                await AsyncStorage.setItem('userToken', token); //  Guardar el token de usuario
-                navigation.navigate('HomeScreen'); // Pasar el nombre de usuario como parámetro
-                console.log(navigation);
-            } else {
-                Alert.alert('Error', 'Usuario o contraseña incorrectos'); // Mostrar alerta de error
-            }
-        } catch (e) {
-            console.error('Error en el inicio de sesión', e); // Mostrar error en consola
-        }
-    };
+  const handleLogin = async (values) => {
+    try {
+      const { correo, contrasena } = values;
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Inicio de Sesión</Text>
-             <Formik
-                    initialValues={{ correo: '', contrasena: '' }}
-                    validationSchema={validaciones}
-                    onSubmit={(values) => {
-                      console.log('Formulario enviado:', values);
-                    }}
-                  >
+      if (correo === 'leonardo@gmail.com' && contrasena === 'contraS') {
+        const token = 'faketoken123'; // Token de usuario
+        await AsyncStorage.setItem('userToken', token); //  Guardar el token de usuario
+        navigation.navigate('HomeScreen');  
+      } else {
+        Alert.alert('Error', 'Usuario o contraseña incorrectos');// Mostrar alerta de error
+      }
+    } catch (e) {
+      console.error('Error en el inicio de sesión', e); //Mostrar error en consola
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Inicio de Sesión</Text>
+      
+      <Formik
+        initialValues={{ correo: '', contrasena: '' }}
+        validationSchema={validaciones}
+        onSubmit={(values) => handleLogin(values)}
+      >
+        {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+          <>
             <TextInput
-                style={styles.input}
-                placeholder="Nombre de usuario"
-                placeholderTextColor="gray"
-                value={correo}
-                onChangeText={setCorreo}
+              style={styles.input}
+              placeholder="Correo electrónico"
+              placeholderTextColor="gray"
+              value={values.correo}
+              onChangeText={handleChange('correo')}
+              onBlur={handleBlur('correo')}
+              autoCapitalize="none"
             />
+            {errors.correo && <Text style={styles.error}>{errors.correo}</Text>}
+
             <TextInput
-                style={styles.input}
-                placeholder="Contraseña"
-                placeholderTextColor="gray"
-                value={contrasena}
-                onChangeText={setContrasena}
-                secureTextEntry
+              style={styles.input}
+              placeholder="Contraseña"
+              placeholderTextColor="gray"
+              secureTextEntry
+              value={values.contrasena}
+              onChangeText={handleChange('contrasena')}
+              onBlur={handleBlur('contrasena')}
+              autoCapitalize="none"
             />
-            <Button title="Iniciar Sesión" onPress={handleLogin} />
-            </Formik>
-        </View>
-    );
+            {errors.contrasena && <Text style={styles.error}>{errors.contrasena}</Text>}
+
+            <Button title="Iniciar Sesión" onPress={handleSubmit} />
+          </>
+        )}
+      </Formik>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 16,
-        backgroundColor: 'black',
-    },
-    title: {
-        fontSize: 24,
-        marginBottom: 16,
-        textAlign: 'center',
-        color: 'white',
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 12,
-        paddingHorizontal: 8,
-        color: 'white',
-    },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 16,
+    backgroundColor: 'black',
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 16,
+    textAlign: 'center',
+    color: 'white',
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 8,
+    color: 'white',
+  },
+  error: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 10,
+  },
 });
 
 export default LoginScreen;
